@@ -5,7 +5,8 @@ rm(list=ls())
 
 if (!require("pacman")) install.packages("pacman")
 pacman::p_load(tidyverse, lubridate, textdata,
-               tidytext, glue, ggthemes, ggHoriPlot)
+               tidytext, glue, ggthemes, ggHoriPlot,
+               lmtest, patchwork)
 
 reddit <- read_csv('djia-vs-reddit/RedditNews.csv') %>%
     group_by(Date) %>%
@@ -130,3 +131,76 @@ djia_plot <- djia %>% ggplot() +
 ggsave("djia-vs-reddit/djia-plot.png", 
        djia_plot,
        height = 9, width = 16, dpi = 100, device = "png")
+
+reddit_sentmean / djia_plot
+
+
+join_df <- daily_df %>%
+    inner_join(djia, by=c("Year", "Month", "Day"))
+
+# What about a real side-by-side comparison?
+join_df %>%
+    mutate(Date = make_date(Year, Month, Day)) %>%
+    select(-c(Date.x, Date.y, Year, Month, Day)) %>%
+    mutate(`Adj Close` = scale(`Adj Close`)) %>%
+    pivot_longer(cols = c(SentimentalMean, `Adj Close`)) %>%
+    ggplot(aes(x = Date, y = value, color = name)) +
+        geom_line() +
+        theme_fivethirtyeight()
+
+join_df <- join_df %>%
+    select(`Adj Close`, SentimentalMean) %>%
+    relocate(`Adj Close`) %>%
+    scale()
+
+AdjClose <- join_df[,1]
+SentimentalMean <- join_df[,2]
+
+grangertest(AdjClose ~ SentimentalMean, order = 1)
+
+# Granger causality test
+# 
+# Model 1: AdjClose ~ Lags(AdjClose, 1:1) + Lags(SentimentalMean, 1:1)
+# Model 2: AdjClose ~ Lags(AdjClose, 1:1)
+# Res.Df Df      F Pr(>F)
+# 1   1985                 
+# 2   1986 -1 0.7953 0.3726
+
+# Model 1: attempts to predict AdjClose using the 1 previous  AdjClose and 1 SentimentalMean as predictor variables.
+# Model 2: attempts to predict AdjClose using only 1 previous AdjClose
+
+# p>.05, this means we fail to reject the null hypothesis that these two models are essentially no difference. Thus the SentimentalMean does not contribute in predicting the AdjClose.
+
+# What about including some lags?
+
+grangertest(AdjClose ~ SentimentalMean, order = 2)
+grangertest(AdjClose ~ SentimentalMean, order = 3)
+grangertest(AdjClose ~ SentimentalMean, order = 4)
+grangertest(AdjClose ~ SentimentalMean, order = 5)
+grangertest(AdjClose ~ SentimentalMean, order = 6)
+grangertest(AdjClose ~ SentimentalMean, order = 7)
+
+# Funny thing, if we reverse the order, say does AdjClose affect the SentimentalMean?
+
+grangertest(SentimentalMean ~ AdjClose, order = 1)
+
+# The answer is yes.
+
+grangertest(SentimentalMean ~ AdjClose, order = 2)
+grangertest(SentimentalMean ~ AdjClose, order = 3)
+grangertest(SentimentalMean ~ AdjClose, order = 4)
+grangertest(SentimentalMean ~ AdjClose, order = 5)
+grangertest(SentimentalMean ~ AdjClose, order = 6)
+grangertest(SentimentalMean ~ AdjClose, order = 7)
+
+grangertest(SentimentalMean ~ AdjClose, order = 14)
+grangertest(SentimentalMean ~ AdjClose, order = 21)
+grangertest(SentimentalMean ~ AdjClose, order = 28)
+
+
+# reflections:
+# - if we mix the multiple sentiments into one, the impact is insignificant,
+# recall the paper only claims certain "mood" is causal.
+# - similar reasoning in the paper: the reddit news might not be representative enough to reflect the public mood
+#   - if might be the user group of reddit does not overlap with the population who really make investment decisions.
+#   - the news coverage: worldwide; the DJIA coverage: US stock market.

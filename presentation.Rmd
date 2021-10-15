@@ -61,7 +61,7 @@ Granger causality analysis and a Self-Organizing Fuzzy Neural Network
 
 - improved prediction accuracy of Dow Jones Industrial Average (DJIA) by the inclusion of public mood dimensions
 - public mood states are predictive of changes in DJIA closing values
-- Calm and Happiness by GPOMS seem to have a predictive effect, but not general happiness by OpnionFinder.
+- Calm and Happiness by GPOMS seem to have a predictive effect, but not general happiness by OpinionFinder.
 
 ---
 
