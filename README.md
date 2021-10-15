@@ -50,7 +50,7 @@ public mood states -> collective decision making?
     - GPOMS
       - 6 dimensions, 6 moods
         - *Calm, Alert, Sure, Vital, Kind* and *Happy*.
-        - dimensions and lexicon dervied from existing psychometric instrument Profile of Mood State (POMS-bi)
+        - dimensions and lexicon derived from existing psychometric instrument Profile of Mood State (POMS-bi)
       - Google apparently utilizes its computational power and exposure to immense amount of text data to fine tune the model
       - tweet -> POMS mood dimensions (quite complex here mapping back and forth, but eventually) -> a score which is the weighted sum of the co-occurrence weights of each tweet term that matched the GPOMS lexicon
     - comparison between GPOMS and OF: normalization to z-score (with a moving 2k days' average) (See the formula)
@@ -100,7 +100,7 @@ It's very hard to replicate the experiment since the main website of that projec
 
 This is almost certain since the followers will react to what they are following no matter what, unless they are no longer followers. For example, we get stock prices of a stock, then we see if the rise and fall of that stock is reflected in a subreddit's collective sentimental changes.
 
-## Referneces
+## References
 
 - [Sentiment Analysis of Twitter Data for Predicting Stock Market Movements](https://arxiv.org/abs/1610.09225), [pdf](./1610.09225.pdf)
 - [you915/Sentiment-Analysis-of-Twitter-Data-for-predicting-Apple-stock-price](https://github.com/you915/Sentiment-Analysis-of-Twitter-Data-for-predicting-Apple-stock-price)
