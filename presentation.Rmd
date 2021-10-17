@@ -222,6 +222,144 @@ This is almost certain since the followers will react to what they are following
 
 ---
 
+# Reddit /r/news
+
+- [Kaggle](https://www.kaggle.com/ndrewgele/omg-nlp-with-the-djia-and-reddit/data)
+
+![img](image/04.png)
+
+---
+
+# Preprocessing
+
+![img](image/05.png)
+
+---
+
+# Sentiment Lexicons
+
+The `tidytext` package provides access to several sentiment lexicons. Three general-purpose lexicons are
+
+- AFINN from [Finn Årup Nielsen](http://www2.imm.dtu.dk/pubdb/pubs/6010-full.html),
+- bing from [Bing Liu and collaborators](https://www.cs.uic.edu/~liub/FBS/sentiment-analysis.html), and
+- nrc from [Saif Mohammad and Peter Turney](http://saifmohammad.com/WebPages/NRC-Emotion-Lexicon.htm).
+
+---
+
+# AFINN
+
+![img](image/07.png)
+
+---
+
+# AFINN
+
+![img](image/08.png)
+
+---
+
+# SentimenalMean
+
+![img](image/01-reddit-sentmean.png)
+
+---
+
+# DJIA
+
+![img](image/02-djia-plot.png)
+
+---
+
+# Reddit vs DJIA
+
+**???**
+
+--
+
+![img](image/03-side-by-side.png)
+
+---
+
+# Granger Causality Test
+
+## AdjClose ~ SentimentalMean
+
+![img](image/09.png)
+
+---
+
+# Granger Causality Test
+
+## AdjClose ~ SentimentalMean
+
+![img](image/10.png)
+---
+
+# Granger Causality Test
+
+## SentimentalMean ~ AdjClose
+
+![img](image/11.png)
+---
+
+# Granger Causality Test
+
+## SentimentalMean ~ AdjClose
+
+![img](image/12.png)
+
+---
+
+# nrc
+
+![img](image/06.png)
+
+---
+
+# nrc + AFINN
+
+![img](image/13.png)
+
+---
+
+# Granger Causality
+
+## with nrc + AFINN
+
+![img](image/14.png)
+---
+
+# Granger Causality
+
+## with nrc + AFINN
+
+```{r, echo=TRUE, eval=FALSE}
+join_df3 <- join_df2 %>%
+    filter(Date < as_date("2009-01-01"))
+
+for (senti in unique(join_df3$sentiment)) {
+    for (order in 1:14) {
+        test <- grangertest(`Adj Close` ~ SentimentalMean,
+                            order = order,
+                            data = filter(join_df3, sentiment == senti))
+        if (test$`Pr(>F)`[2] < 0.1) {
+            print(senti)
+            print(test)
+        }
+    }
+}
+```
+
+---
+
+# Granger Causality
+
+## with nrc + AFINN
+
+![img](image/15.png)
+
+---
+
 class: inverse, center, middle
 
 # VI. Summary

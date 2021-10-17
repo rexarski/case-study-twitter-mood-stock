@@ -139,7 +139,7 @@ join_df <- daily_df %>%
     inner_join(djia, by=c("Year", "Month", "Day"))
 
 # What about a real side-by-side comparison?
-join_df %>%
+side_by_side <- join_df %>%
     mutate(Date = make_date(Year, Month, Day)) %>%
     select(-c(Date.x, Date.y, Year, Month, Day)) %>%
     mutate(`Adj Close` = scale(`Adj Close`)) %>%
@@ -147,6 +147,10 @@ join_df %>%
     ggplot(aes(x = Date, y = value, color = name)) +
         geom_line() +
         theme_fivethirtyeight()
+
+ggsave("djia-vs-reddit/side_by_side.png", 
+       side_by_side,
+       height = 9, width = 16, dpi = 100, device = "png")
 
 join_df <- join_df %>%
     select(`Adj Close`, SentimentalMean) %>%
@@ -204,3 +208,81 @@ grangertest(SentimentalMean ~ AdjClose, order = 28)
 # - similar reasoning in the paper: the reddit news might not be representative enough to reflect the public mood
 #   - if might be the user group of reddit does not overlap with the population who really make investment decisions.
 #   - the news coverage: worldwide; the DJIA coverage: US stock market.
+# - maybe, if we select a small window of time interval would change the result.
+
+# again, do sentimental analysis but with ncr
+
+daily_df2 <- tidy_df %>%
+    right_join(get_sentiments("nrc")) %>%
+    right_join(get_sentiments("afinn")) %>%
+    drop_na() %>%
+    group_by(Date, sentiment) %>%
+    summarize(SentimentalMean = mean(value))
+
+# ten_moods <- ggplot(daily_df2, aes(x=Date, y=value,
+#                                    color = sentiment)) +
+#     geom_line() +
+#     facet_wrap(.~sentiment)
+# ten_moods
+
+djia2 <- read_csv("djia-vs-reddit/DJIA_table.csv") %>%
+    select(Date, `Adj Close`) %>%
+    mutate(`Adj Close` = scale(`Adj Close`)) %>%
+    drop_na()
+
+join_df2 <- daily_df2 %>%
+    inner_join(djia2, by="Date")
+
+for (senti in unique(join_df2$sentiment)) {
+    for (order in 1:14) {
+        test <- grangertest(`Adj Close` ~ SentimentalMean,
+                            order = order,
+                            data = filter(join_df2, sentiment == senti))
+        if (test$`Pr(>F)`[2] < 0.1) {
+            print(test)
+            print(test)
+        }
+    }
+}
+
+# If we really filter the data, say we only keep data in 2008.
+# p-value = 0.1 as a threshold
+
+join_df3 <- join_df2 %>%
+    filter(Date < as_date("2009-01-01"))
+
+for (senti in unique(join_df3$sentiment)) {
+    for (order in 1:14) {
+        test <- grangertest(`Adj Close` ~ SentimentalMean,
+                            order = order,
+                            data = filter(join_df3, sentiment == senti))
+        if (test$`Pr(>F)`[2] < 0.1) {
+            print(senti)
+            print(test)
+        }
+    }
+}
+
+# un-scale the adj close:
+
+djia3 <- read_csv("djia-vs-reddit/DJIA_table.csv") %>%
+    select(Date, `Adj Close`) %>%
+    drop_na()
+
+join_df4 <- daily_df2 %>%
+    inner_join(djia3, by="Date") %>%
+    filter(Date < as_date("2009-01-01"))
+
+for (senti in unique(join_df4$sentiment)) {
+    for (order in 1:14) {
+        test <- grangertest(`Adj Close` ~ SentimentalMean,
+                            order = order,
+                            data = filter(join_df4, sentiment == senti))
+        if (test$`Pr(>F)`[2] < 0.1) {
+            print(senti)
+            print(test)
+        }
+    }
+}
+
+# this returns the same result. scale() does not affect the results.
