@@ -35,15 +35,13 @@ class: center, middle
 
 - previously, random walk + Efficient Market Hypothesis (EMH)
   - content: stock prices -> driven by new information (rather than past and present prices)
-  - issues:
-    - not a random walk
-    - news unpredictable, but very early indicators from social media can be extracted
+  - issues: (1) not a random walk; (2) news unpredictable, but very early indicators from social media can be extracted
 - news does impact stock market prices, but public mood states might be just equally important, but **HOW**?
 - public mood **data sources**: blog content, **large-scale Twitter feeds**, etc.
 
 --
 
-## Analysis:
+## Analysis
 
 1. OpinionFinder (+/- mood)
 2. Google-Profile of Mood States (GPOMS) (6-dim mood measures)
@@ -67,7 +65,7 @@ Granger causality analysis and a Self-Organizing Fuzzy Neural Network
 
 class: inverse, center, middle
 
-## II. Background Knowledge
+# II. Background Knowledge
 
 ---
 
@@ -151,16 +149,28 @@ class: inverse, center, middle
 
 # Bivariate Granger Causality Analysis
 
-Mood vs. DJIA prices
+**Mood vs. DJIA prices**
 
 - Granger causality analysis: daily time series vs the DJIA
 - Recall the assumption: if a variable X causes Y then changes in X will systematically occur before changes in Y -> the lagged values of X will exhibit a statistically significant correlation with Y
 - It's not a direct proof of causality. It's only testing if one time series has predictive information about the other.
 - two models `L_1` and `L_2` (excluding exceptional public mood response)
-  - `L_1`: only n lagged values of DJIA
-  - `L_2`: n lagged values + GPOMS + OF mood time series
+  - `L_1`: only n lagged values of DJIA: $D_t = \alpha + \sum_{i=1}^{n} \beta_iD_{t-1}$
+  - `L_2`: n lagged values + GPOMS + OF mood time series: $D_t = \alpha + \sum_{i=1}^{n} \beta_iD_{t-i} + \sum_{i=1}^{n} \gamma_iX_{t-i} + err_t$
+- $D_t = D_t - D_{t-1}$
+
+---
+# Bivariate Granger Causality Analysis
+
 - Interpret the result table
+  
+![img](image/granger_table.jpeg)
+
+---
+# Bivariate Granger Causality Analysis
+
 - Interpret the overlapping plots together (same directions, etc.)
+   ![img](image/granger_fig.jpeg)
 
 ---
 
@@ -174,20 +184,38 @@ class: inverse, center, middle
 
 - Granger causality analysis is based on linear regression. This is too ideal, almost certainly not linear.
 - So here we introduce another approach, the Self-Organizing Fuzzy Neural Network (SOFNN), which has 2 inputs:
-  - (1) the past 3 days of DJIA
-  - (2) the same combined with various permutations of our mood time series
+  -the past 3 days of DJIA
+  -the same combined with various permutations of our mood time series
+
+- $I_0 = \{DJIA_{t-3,2,1}\}$
+- $I_1 = \{DJIA_{t-3,2,1}, X_{1,t-3,2,1}\}$
+- $I_{1,2} = \{DJIA_{t-3,2,1}, X_{1,t-3,2,1},X_{2,t-3,2,1}\}$
+- $X_{i,t-3,2,1}$: GPOMS/OF mood of dimension i at time t-1, t-2,t-3.
 - see if SOFNN confirms or rejects the null hypothesis that public mood does not improve predictive models of DJIA
 - model came from a previous study, `n` days of DJIA, `n=3` since `n=4` the Granger causality between *Calm* and DJIA decreases.
-- result: only *Calm* (and to some degree *Happy*) is Granger-causative of DJIA, but others combined could be informative as well.
+
 ---
 
 # SOFNN
 
 - result2: previous one is about the mood dimensions of GPOMS, what about OF? Solely use SOFNN with OF (Table III for the performance)
-  - (1) adding OF has no effect on prediction accuracy compared to using only historical DJIA
-  - (2) adding *Calm*, the prediction accuracy is the highest
-  - (3) `I_1,3` and `I_1,4` (*Calm* + *Sure* and *Calm* + *Vital*) reduce the accuracy
-- last check: test the linear effect of *Calm* and *Happy* -> confirm a nonlinear relation among the different dimensions of moods.
+  ![alt text here](image/sofnn_table.jpeg)
+  - MAPE: Mean Absolute Percentage Error
+  - direction accuracy: correctness of up/down prediction
+  - (1)only *Calm* (and to some degree *Happy*) is Granger-causative of DJIA, but others combined could be informative as well.
+  - (2) adding OF has no effect on prediction accuracy compared to using only historical DJIA
+  - (3) adding $I_1$ (*Calm*), the prediction accuracy is the highest
+  - (4) $I_{1,3}$ and $I_{1,4}$ (*Calm* + *Sure* and *Calm* + *Vital*) reduce the accuracy
+
+---
+
+# SOFNN
+  
+- last check: test the linear effect of *Calm* and *Happy*
+ - $D_t = \alpha + \sum_{i=1}^{n} \beta_iD_{t-i} + \sum_{i=1}^{n} \gamma_iX_{1,t-i} + \sum_{i=1}^{n} \gamma_iX_{6,t-i} + err_t$
+ - F-statistics of 0.53 and p-value of 0.66 indicates that a linear combination of $X_1, X_6$ produce worse resulyt than $X_1$ alone
+ - However, SOFNN prediction is more accurate when using combination of $X_1,X_6$
+ - Confirm a nonlinear relation among the different dimensions of moods.
 
 ---
 
@@ -199,8 +227,7 @@ class: inverse, center, middle
 
 # Discussion
 
-- (Basically reiterate everything mentioned above.)
-- But the last paragraph does have some insights on the drawbacks of this experiment.
+- The last paragraph does have some insights on the drawbacks of this experiment.
   - (1) not limited to a geolocation, or a population subset (because DJIA is for US stock market)
   - (2) no ground truth about Twitter's tweets and the real public mood states, just one perspective
   - (3) still hints for strong correlation between the two, but offers nothing substantial about the causality
@@ -222,20 +249,6 @@ This is almost certain since the followers will react to what they are following
 
 ---
 
-# Reddit /r/news
-
-- [Kaggle](https://www.kaggle.com/ndrewgele/omg-nlp-with-the-djia-and-reddit/data)
-
-![img](image/04.png)
-
----
-
-# Preprocessing
-
-![img](image/05.png)
-
----
-
 # Sentiment Lexicons
 
 The `tidytext` package provides access to several sentiment lexicons. Three general-purpose lexicons are
@@ -246,146 +259,17 @@ The `tidytext` package provides access to several sentiment lexicons. Three gene
 
 ---
 
-# AFINN
+# mood.r
 
-![img](image/07.png)
+![img](https://media.giphy.com/media/p7bARE6qG87BSPNUJK/giphy.gif)
 
----
-
-# AFINN
-
-![img](image/08.png)
-
----
-
-# SentimenalMean
-
-![img](image/01-reddit-sentmean.png)
-
----
-
-# DJIA
-
-![img](image/02-djia-plot.png)
-
----
-
-# Reddit vs DJIA
-
-**???**
-
---
-
-![img](image/03-side-by-side.png)
-
----
-
-# Granger Causality Test
-
-## AdjClose ~ SentimentalMean
-
-![img](image/09.png)
-
----
-
-# Granger Causality Test
-
-## AdjClose ~ SentimentalMean
-
-![img](image/10.png)
----
-
-# Granger Causality Test
-
-## SentimentalMean ~ AdjClose
-
-![img](image/11.png)
----
-
-# Granger Causality Test
-
-## SentimentalMean ~ AdjClose
-
-![img](image/12.png)
-
----
-
-# nrc
-
-![img](image/06.png)
-
----
-
-# nrc + AFINN
-
-![img](image/13.png)
-
----
-
-# Granger Causality
-
-## with nrc + AFINN
-
-![img](image/14.png)
----
-
-# Granger Causality
-
-## with nrc + AFINN
-
-```{r, echo=TRUE, eval=FALSE}
-join_df3 <- join_df2 %>%
-    filter(Date < as_date("2009-01-01"))
-
-for (senti in unique(join_df3$sentiment)) {
-    for (order in 1:14) {
-        test <- grangertest(`Adj Close` ~ SentimentalMean,
-                            order = order,
-                            data = filter(join_df3, sentiment == senti))
-        if (test$`Pr(>F)`[2] < 0.1) {
-            print(senti)
-            print(test)
-        }
-    }
-}
-```
-
----
-
-# Granger Causality
-
-## with nrc + AFINN
-
-![img](image/15.png)
+[click me](djia-vs-reddit/mood.R)
 
 ---
 
 class: inverse, center, middle
 
-# VI. Summary
-
----
-
-# Summary
-
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
-Questions?
-
----
-
-class: inverse, center, middle
-
-# References
-
----
-
-# References
-
-- [Twitter mood predicts the stock market](https://arxiv.org/abs/1010.3003)
-- [Sentiment Analysis of Twitter Data for Predicting Stock Market Movements](https://arxiv.org/abs/1610.09225)
-- [you915/Sentiment-Analysis-of-Twitter-Data-for-predicting-Apple-stock-price](https://github.com/you915/Sentiment-Analysis-of-Twitter-Data-for-predicting-Apple-stock-price)
-- [Make Your Presentations Fun in Xaringan](http://svmiller.com/blog/2018/02/r-markdown-xaringan-theme/)
+# VI. ¿Question time?
 
 ---
 class: center, middle

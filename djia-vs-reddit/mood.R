@@ -33,6 +33,11 @@ daily_df <- tidy_df %>%
     group_by(Date) %>%
     summarize(SentimentalMean = mean(value))
 
+daily_df <- daily_df %>%
+    mutate(SentimentalMean = scale(SentimentalMean,
+                                   center = TRUE,
+                                   scale = TRUE))
+
 cutpoints <- daily_df %>%
     mutate(
         outlier = between(
@@ -76,9 +81,9 @@ reddit_sentmean <- daily_df %>% ggplot() +
                  date_breaks = "1 month", 
                  date_labels = "%b") +
     xlab("Date") +
-    ggtitle("Average daily sentimental value of all news post in Reddit",
+    ggtitle("Z-score of sentimental mean of all news post in Reddit",
             "from 2008 to 2016")
-ggsave("djia-vs-reddit/reddit-sentmean.png", 
+ggsave("image/01-reddit-sentmean.png", 
        reddit_sentmean,
        height = 9, width = 16, dpi = 100, device = "png")
 
@@ -88,7 +93,9 @@ djia <- read_csv("djia-vs-reddit/DJIA_table.csv") %>%
     mutate(Year = year(Date),
            Month = month(Date),
            Day = day(Date)) %>%
-    drop_na()
+    drop_na() %>%
+    mutate(`Adj Close` = scale(`Adj Close`, 
+                               scale=TRUE, center=TRUE))
 year(djia$Date) <- 2021
 
 cutpoints2 <- djia %>%
@@ -126,9 +133,9 @@ djia_plot <- djia %>% ggplot() +
                  date_breaks = "1 month", 
                  date_labels = "%b") +
     xlab("Date") +
-    ggtitle("Daily Adjusted Close DJIA",
+    ggtitle("Z-score of Adjusted Close DJIA",
             "from 2008 to 2016")
-ggsave("djia-vs-reddit/djia-plot.png", 
+ggsave("image/02-djia-plot.png", 
        djia_plot,
        height = 9, width = 16, dpi = 100, device = "png")
 
@@ -142,33 +149,23 @@ join_df <- daily_df %>%
 side_by_side <- join_df %>%
     mutate(Date = make_date(Year, Month, Day)) %>%
     select(-c(Date.x, Date.y, Year, Month, Day)) %>%
-    mutate(`Adj Close` = scale(`Adj Close`)) %>%
     pivot_longer(cols = c(SentimentalMean, `Adj Close`)) %>%
     ggplot(aes(x = Date, y = value, color = name)) +
         geom_line() +
         theme_fivethirtyeight()
 
-ggsave("djia-vs-reddit/side_by_side.png", 
+ggsave("image/03-side-by-side.png", 
        side_by_side,
        height = 9, width = 16, dpi = 100, device = "png")
 
 join_df <- join_df %>%
     select(`Adj Close`, SentimentalMean) %>%
-    relocate(`Adj Close`) %>%
-    scale()
+    relocate(`Adj Close`)
 
-AdjClose <- join_df[,1]
-SentimentalMean <- join_df[,2]
+AdjClose <- join_df$`Adj Close`
+SentimentalMean <- join_df$SentimentalMean
 
 grangertest(AdjClose ~ SentimentalMean, order = 1)
-
-# Granger causality test
-# 
-# Model 1: AdjClose ~ Lags(AdjClose, 1:1) + Lags(SentimentalMean, 1:1)
-# Model 2: AdjClose ~ Lags(AdjClose, 1:1)
-# Res.Df Df      F Pr(>F)
-# 1   1985                 
-# 2   1986 -1 0.7953 0.3726
 
 # Model 1: attempts to predict AdjClose using the 1 previous  AdjClose and 1 SentimentalMean as predictor variables.
 # Model 2: attempts to predict AdjClose using only 1 previous AdjClose
@@ -192,11 +189,8 @@ grangertest(SentimentalMean ~ AdjClose, order = 1)
 
 grangertest(SentimentalMean ~ AdjClose, order = 2)
 grangertest(SentimentalMean ~ AdjClose, order = 3)
-grangertest(SentimentalMean ~ AdjClose, order = 4)
-grangertest(SentimentalMean ~ AdjClose, order = 5)
-grangertest(SentimentalMean ~ AdjClose, order = 6)
-grangertest(SentimentalMean ~ AdjClose, order = 7)
 
+grangertest(SentimentalMean ~ AdjClose, order = 7)
 grangertest(SentimentalMean ~ AdjClose, order = 14)
 grangertest(SentimentalMean ~ AdjClose, order = 21)
 grangertest(SentimentalMean ~ AdjClose, order = 28)
@@ -217,9 +211,12 @@ daily_df2 <- tidy_df %>%
     right_join(get_sentiments("afinn")) %>%
     drop_na() %>%
     group_by(Date, sentiment) %>%
-    summarize(SentimentalMean = mean(value))
+    summarize(SentimentalMean = mean(value)) %>%
+    mutate(SentimentalMean = scale(SentimentalMean,
+                                   center=TRUE,
+                                   scale=TRUE))
 
-# ten_moods <- ggplot(daily_df2, aes(x=Date, y=value,
+# ten_moods <- ggplot(daily_df2, aes(x=Date, y=SentimentalMean,
 #                                    color = sentiment)) +
 #     geom_line() +
 #     facet_wrap(.~sentiment)
@@ -227,7 +224,8 @@ daily_df2 <- tidy_df %>%
 
 djia2 <- read_csv("djia-vs-reddit/DJIA_table.csv") %>%
     select(Date, `Adj Close`) %>%
-    mutate(`Adj Close` = scale(`Adj Close`)) %>%
+    mutate(`Adj Close` = scale(`Adj Close`, center = TRUE,
+                               scale = TRUE)) %>%
     drop_na()
 
 join_df2 <- daily_df2 %>%
@@ -238,8 +236,8 @@ for (senti in unique(join_df2$sentiment)) {
         test <- grangertest(`Adj Close` ~ SentimentalMean,
                             order = order,
                             data = filter(join_df2, sentiment == senti))
-        if (test$`Pr(>F)`[2] < 0.1) {
-            print(test)
+        if (test$`Pr(>F)`[2] < 0.05) {
+            print(senti)
             print(test)
         }
     }
@@ -256,33 +254,9 @@ for (senti in unique(join_df3$sentiment)) {
         test <- grangertest(`Adj Close` ~ SentimentalMean,
                             order = order,
                             data = filter(join_df3, sentiment == senti))
-        if (test$`Pr(>F)`[2] < 0.1) {
+        if (test$`Pr(>F)`[2] < 0.05) {
             print(senti)
             print(test)
         }
     }
 }
-
-# un-scale the adj close:
-
-djia3 <- read_csv("djia-vs-reddit/DJIA_table.csv") %>%
-    select(Date, `Adj Close`) %>%
-    drop_na()
-
-join_df4 <- daily_df2 %>%
-    inner_join(djia3, by="Date") %>%
-    filter(Date < as_date("2009-01-01"))
-
-for (senti in unique(join_df4$sentiment)) {
-    for (order in 1:14) {
-        test <- grangertest(`Adj Close` ~ SentimentalMean,
-                            order = order,
-                            data = filter(join_df4, sentiment == senti))
-        if (test$`Pr(>F)`[2] < 0.1) {
-            print(senti)
-            print(test)
-        }
-    }
-}
-
-# this returns the same result. scale() does not affect the results.
