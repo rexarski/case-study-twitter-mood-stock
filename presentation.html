@@ -17,7 +17,7 @@ class: center, middle, inverse, title-slide
 ## Twitter mood predicts the stock market
 ### Sonali Pednekar (ssp88), Rui Qiu (rq47), <br /> Jiahui Wu (jw1987), Yu Kang (yk685)
 ### <br />Georgetown University
-### Oct 20, 2021 (updated: 2021-10-17)
+### Oct 20, 2021 (updated: 2021-10-18)
 
 ---
 
@@ -142,7 +142,18 @@ Cross-validating against socio-cultural events
 
 - Test run on U.S. presidential election and Thanksgiving
 - Visual inspection -&gt; *Happy* approximates the OF's results -&gt; MLR to quantify such relationship (`Y_OF` vs `X_GPOMS`)
-- (nothing really interesting here)
+
+---
+
+# Cross-validation
+
+![img](image/cross_validation_1.png)
+
+---
+
+# Cross-validation
+
+![img](image/cross_validation_2.png)
 
 ---
 
@@ -222,6 +233,8 @@ class: inverse, center, middle
  - However, SOFNN prediction is more accurate when using combination of `\(X_1,X_6\)`
  - Confirm a nonlinear relation among the different dimensions of moods.
 
+![img](image/sofnn_equation.jpeg)
+
 ---
 
 class: inverse, center, middle
@@ -236,7 +249,8 @@ class: inverse, center, middle
   - (1) not limited to a geolocation, or a population subset (because DJIA is for US stock market)
   - (2) no ground truth about Twitter's tweets and the real public mood states, just one perspective
   - (3) still hints for strong correlation between the two, but offers nothing substantial about the causality
-    - maybe the general public at that moment are all financial experts who strongly invested in DJIA, therefore their mood states will affect their investment decisions -&gt; stock market prices (no one could know this)
+- no evidence for relation between people who invest and people who use Twitter
+- maybe the general public at that moment are all financial experts who strongly invested in DJIA, therefore their mood states will affect their investment decisions -&gt; stock market prices (no one could know this)
 
 ---
 
@@ -268,7 +282,7 @@ The `tidytext` package provides access to several sentiment lexicons. Three gene
 
 ![img](https://media.giphy.com/media/p7bARE6qG87BSPNUJK/giphy.gif)
 
-[click me](djia-vs-reddit/mood.R)
+[script](djia-vs-reddit/mood.R)
 
 ---
 

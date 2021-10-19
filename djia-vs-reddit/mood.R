@@ -260,3 +260,5 @@ for (senti in unique(join_df3$sentiment)) {
         }
     }
 }
+
+# oops, nothing to do with association rule mining or network, except Twitter is a social networking service. And it contains the word 'network'?
