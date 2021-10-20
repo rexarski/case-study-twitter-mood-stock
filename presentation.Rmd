@@ -71,13 +71,20 @@ class: inverse, center, middle
 
 # Granger Causality Analysis
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-
+- It is a way to investigate causality between two variables in a time series.
+- A variable X is causal to variable Y if X is the cause of Y or Y is the cause of X.
+- Granger causality is a “bottom up” procedure
+- The null hypothesis for the test is that x-values do not explain the variation in y.
+- The Granger causality test is a statistical hypothesis test for determining whether one time series is useful for forecasting another.
 ---
 
 # Self-Organizing Fuzzy Neural Network (SOFNN)
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+- fuzzy logic provides human reasoning capabilities to capture uncertainties
+- advantages of neural networks (such as adaptive learning, parallelism, fault tolerance, and generalization)
+- powerful techniques in the discipline of system control
+- Therefore, fuzzy logic and neural networks have been widely adopted in model-free adaptive control of nonlinear systems.
+- No priori knowledge of the distribution of the input data is needed for initialization of fuzzy rules. They are automatically generated with the incoming training data.
 
 ---
 
@@ -140,13 +147,13 @@ Cross-validating against socio-cultural events
 
 # Cross-validation
 
-![img](image/cross_validation_2.png)
+![img](image/cross_validation_1.png)
 
 ---
 
 # Cross-validation
 
-![img](image/cross_validation_1.png)
+![img](image/cross_validation_2.png)
 
 ---
 
@@ -256,6 +263,12 @@ class: inverse, center, middle
 # Demo
 
 It's very hard to replicate the experiment since the main website of that project is down. Think about it, it's rather hard to acquire large-scale data today to reflect a collective public mood state. But we can do it from an opposite direction, namely, we get some specific high-level metric, and see if it is predictive of its followers' mood states.
+
+$$\text{world (news)} \implies \text{people's mood} \implies \text{decision making} \implies \text{stock}$$
+
+--
+
+$$\text{world (news)} \implies \text{sentiment of news} \implies \text{stock}$$
 
 This is almost certain since the followers will react to what they are following no matter what, unless they are no longer followers. For example, we get stock prices of a stock, then we see if the rise and fall of that stock is reflected in a subreddit's collective sentimental changes.
 

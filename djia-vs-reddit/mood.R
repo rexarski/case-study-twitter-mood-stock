@@ -203,10 +203,10 @@ grangertest(SentimentalMean ~ AdjClose, order = 28)
 
 
 # reflections:
-# - if we mix the multiple sentiments into one, the impact is insignificant,
+# - if we combine the multiple sentiments into one, the impact is insignificant,
 # recall the paper only claims certain "mood" is causal.
 # - similar reasoning in the paper: the reddit news might not be representative enough to reflect the public mood
-#   - if might be the user group of reddit does not overlap with the population who really make investment decisions.
+#   - maybe the user group of reddit does not overlap with the population who really make investment decisions.
 #   - the news coverage: worldwide; the DJIA coverage: US stock market.
 # - maybe, if we select a small window of time interval would change the result.
 
