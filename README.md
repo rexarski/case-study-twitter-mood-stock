@@ -1,6 +1,9 @@
 # README
 
-2021-09-29 rq47
+- Script: [djia-vs-reddit/mood.R](djia-vs-reddit/mood.R)
+- Slides: [rexarski.github.io/case-study-twitter-mood-stock](https://rexarski.github.io/case-study-twitter-mood-stock/#1)
+
+***
 
 [Twitter mood predicts the stock market](https://arxiv.org/abs/1010.3003) by Johan Bollen, Huina Mao, Xiao-Jun Zeng
 
