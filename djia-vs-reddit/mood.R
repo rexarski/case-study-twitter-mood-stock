@@ -14,6 +14,8 @@ reddit <- read_csv('djia-vs-reddit/RedditNews.csv') %>%
     ungroup() %>%
     distinct(Date, DailyText)
 
+reddit
+
 tidy_df <- reddit %>%
     unnest_tokens(word, DailyText,  to_lower = TRUE) %>%
     anti_join(stop_words, by = "word")
@@ -83,6 +85,7 @@ reddit_sentmean <- daily_df %>% ggplot() +
     xlab("Date") +
     ggtitle("Z-score of sentimental mean of all news post in Reddit",
             "from 2008 to 2016")
+reddit_sentmean
 ggsave("image/01-reddit-sentmean.png", 
        reddit_sentmean,
        height = 9, width = 16, dpi = 100, device = "png")
@@ -135,6 +138,7 @@ djia_plot <- djia %>% ggplot() +
     xlab("Date") +
     ggtitle("Z-score of Adjusted Close DJIA",
             "from 2008 to 2016")
+djia_plot
 ggsave("image/02-djia-plot.png", 
        djia_plot,
        height = 9, width = 16, dpi = 100, device = "png")
@@ -153,6 +157,8 @@ side_by_side <- join_df %>%
     ggplot(aes(x = Date, y = value, color = name)) +
         geom_line() +
         theme_fivethirtyeight()
+
+side_by_side
 
 ggsave("image/03-side-by-side.png", 
        side_by_side,
@@ -244,7 +250,6 @@ for (senti in unique(join_df2$sentiment)) {
 }
 
 # If we really filter the data, say we only keep data in 2008.
-# p-value = 0.1 as a threshold
 
 join_df3 <- join_df2 %>%
     filter(Date < as_date("2009-01-01"))
@@ -261,4 +266,4 @@ for (senti in unique(join_df3$sentiment)) {
     }
 }
 
-# oops, nothing to do with association rule mining or network, except Twitter is a social networking service. And it contains the word 'network'?
+# public mood -> (reddit/news) -> personal feelings? -> tweets? -> captured -> stock price prediction
